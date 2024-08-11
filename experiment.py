@@ -58,20 +58,20 @@ if __name__ == "__main__":
     x_test = sc.transform(x_test)
     
 
-    alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
+    C = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
     with mlflow.start_run():
-        lr = LogisticRegression(random_state=42)
+        lr = LogisticRegression(C, l1_ratio, random_state=42)
         lr.fit(x_train, y_train)
 
         predicted_qualities = lr.predict(x_test)
 
         (precision,recall,f1score) = eval_metrics(y_tes>
 
-        print(f"  precision: {precision}")
-        print(f"  recall: {recall}")
-        print(f"  f1score: {f1score}")
+        print(f"precision: {precision}")
+        print(f"recall: {recall}")
+        print(f"f1score: {f1score}")
 
         mlflow.log_param("precision", precision)
         mlflow.log_param("recall", recall)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
    
         # For remote server only (Dagshub)
-        remote_server_uri = "https://dagshub.com/Akhilpm156/my-first-repo.mlflow"
+        remote_server_uri = "https://dagshub.com/Akhilpm156/MLflow-project.mlflow"
         mlflow.set_tracking_uri(remote_server_uri)
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
