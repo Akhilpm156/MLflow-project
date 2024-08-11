@@ -80,12 +80,10 @@ if __name__ == "__main__":
         mlflow.log_metric("r2", r2)
         mlflow.log_metric("mae", mae)
 
-        predictions = lr.predict(x_train)
-        signature = infer_signature(x_train, predictions)
    
-        # # For remote server only (Dagshub)
-        # remote_server_uri = "https://dagshub.com/entbappy/MLflow-Basic-Demo.mlflow"
-        # mlflow.set_tracking_uri(remote_server_uri)
+        # For remote server only (Dagshub)
+        remote_server_uri = "https://dagshub.com/Akhilpm156/my-first-repo.mlflow"
+        mlflow.set_tracking_uri(remote_server_uri)
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
@@ -96,7 +94,6 @@ if __name__ == "__main__":
             # please refer to the doc for more information:
             # https://mlflow.org/docs/latest/model-registry.html#api-workflow
             mlflow.sklearn.log_model(
-                lr, "model", registered_model_name="ElasticnetWineModel", signature=signature
-            )
+                lr, "model", registered_model_name="ElasticnetWineModel")
         else:
-            mlflow.sklearn.log_model(lr, "model", signature=signature)
+            mlflow.sklearn.log_model(lr, "model")
