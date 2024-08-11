@@ -5,8 +5,8 @@ from urllib.parse import urlparse
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import ElasticNet
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler 
 
@@ -19,10 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 def eval_metrics(actual, pred):
-    rmse = np.sqrt(mean_squared_error(actual, pred))
-    mae = mean_absolute_error(actual, pred)
-    r2 = r2_score(actual, pred)
-    return rmse, mae, r2
+    precision = precision_score(actual, pred)
+    recall = recall_score(actual, pred)
+    f1score  = f1_score(actual, pred)
+    return precision, recall, f1score
 
 
 if __name__ == "__main__":
@@ -62,23 +62,20 @@ if __name__ == "__main__":
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
     with mlflow.start_run():
-        lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
+        lr = LogisticRegression(random_state=42)
         lr.fit(x_train, y_train)
 
         predicted_qualities = lr.predict(x_test)
 
-        (rmse, mae, r2) = eval_metrics(y_test, predicted_qualities)
+        (precision,recall,f1score) = eval_metrics(y_tes>
 
-        print(f"Elasticnet model (alpha={alpha:f}, l1_ratio={l1_ratio:f}):")
-        print(f"  RMSE: {rmse}")
-        print(f"  MAE: {mae}")
-        print(f"  R2: {r2}")
+        print(f"  precision: {precision}")
+        print(f"  recall: {recall}")
+        print(f"  f1score: {f1score}")
 
-        mlflow.log_param("alpha", alpha)
-        mlflow.log_param("l1_ratio", l1_ratio)
-        mlflow.log_metric("rmse", rmse)
-        mlflow.log_metric("r2", r2)
-        mlflow.log_metric("mae", mae)
+        mlflow.log_param("precision", precision)
+        mlflow.log_param("recall", recall)
+        mlflow.log_metric("f1score", f1score)
 
    
         # For remote server only (Dagshub)
@@ -94,6 +91,6 @@ if __name__ == "__main__":
             # please refer to the doc for more information:
             # https://mlflow.org/docs/latest/model-registry.html#api-workflow
             mlflow.sklearn.log_model(
-                lr, "model", registered_model_name="ElasticnetWineModel")
+                lr, "model", registered_model_name="LogisticRegression")
         else:
             mlflow.sklearn.log_model(lr, "model")
