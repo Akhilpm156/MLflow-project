@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import mlflow
 from mlflow.models.signature import infer_signature
 import mlflow.sklearn
+import dagshub
 
 import logging
 
@@ -52,6 +53,12 @@ if __name__ == "__main__":
     alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
+    # Set the remote server URI for Dagshub
+    remote_server_uri = "https://dagshub.com/Akhilpm156/mlflow.mlflow" 
+    mlflow.set_tracking_uri(remote_server_uri)
+
+    dagshub.init(repo_owner='Akhilpm156', repo_name='mlflow', mlflow=True)
+
     with mlflow.start_run():
         lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
         lr.fit(train_x, train_y)
@@ -70,14 +77,6 @@ if __name__ == "__main__":
         mlflow.log_metric("rmse", rmse)
         mlflow.log_metric("r2", r2)
         mlflow.log_metric("mae", mae)
-
-        # For remote server only (Dagshub)
-        #remote_server_uri = "https://github.com/Akhilpm156/MLflow-project.git"
-        #mlflow.set_tracking_uri(remote_server_uri)
-
-        # For remote server only (AWS)
-        # remote_server_uri = "http://ec2-54-147-36-34.compute-1.amazonaws.com:5000/"
-        # mlflow.set_tracking_uri(remote_server_uri)
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
